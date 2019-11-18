@@ -177,8 +177,8 @@ class FieldDrawing:
     food_image = {
         Food(): basic_food,
         Food(length_change=2, score=2): gold_apple,
-        Food(length_change=-1, speed_change=0.5): wormy_apple,
-        Food(speed_change=2): high_speed_apple
+        Food(length_change=-1, speed_change=0.75, score=-1): wormy_apple,
+        Food(speed_change=1.5): high_speed_apple
     }
 
     dir_turn_angle_SBI = {
