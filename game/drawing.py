@@ -159,7 +159,7 @@ class FieldDrawing:
     # region load_image
 
     wall = load_image('wall')
-    basic_food = load_image('basic_food')
+    basic_food = load_image('basic_apple')
     gold_apple = load_image('gold_apple')
     wormy_apple = load_image('wormy_apple')
     high_speed_apple = load_image('high_speed_apple')
@@ -172,14 +172,7 @@ class FieldDrawing:
 
     # endregion
 
-    # TODO: перенести куда нибудь потому что это нужно ещё в game,
-    #  наверно добавить в settings.ini/py
-    food_image = {
-        Food(): basic_food,
-        Food(length_change=2, score=2): gold_apple,
-        Food(length_change=-1, speed_change=0.75, score=-1): wormy_apple,
-        Food(speed_change=1.5): high_speed_apple
-    }
+    food_image = {Food(*food): load_image(name) for food, name in settings.food_name_picture.items()}
 
     dir_turn_angle_SBI = {
         Direction.RIGHT: -90,

@@ -1,5 +1,6 @@
 """Модуль настроек игры"""
 import configparser
+from copy import deepcopy
 from os.path import join
 
 
@@ -15,6 +16,28 @@ class Settings:
 
     def _level(self):
         return self._config['LEVEL']
+
+    @staticmethod
+    def _parse_food_characteristics(string: str):
+        speed_change, len_change, score = string.split(',')
+        return float(speed_change), int(len_change), int(score)
+
+    def _food(self) -> dict:
+        return {name: self._parse_food_characteristics(food) for name, food in self._config['FOOD'].items()}
+
+    @property
+    def food(self) -> list:
+        return list(self._food().values())
+
+    @property
+    def not_basic_food(self) -> list:
+        result = deepcopy(self.food)
+        result.remove(self._food()['basic_apple'])
+        return result
+
+    @property
+    def food_name_picture(self) -> dict:
+        return {food: picture for picture, food in self._food().items()}
 
     @property
     def levels(self):

@@ -44,6 +44,8 @@ class Game:
             tick += 1
         return level.health
 
+    not_basic_food = [Food(*t) for t in settings.not_basic_food]
+
     def step_game(self, level: Level, tick, level_drawing: FieldDrawing):
         # TODO: подумать над генерацией еды
         tick_move = self.fps // level.field.snake.speed
@@ -58,7 +60,7 @@ class Game:
             if self._generate_food_location in level.field.foods_location:
                 level.field.foods_location.pop(self._generate_food_location)
             self._generate_food_location = \
-                level.field.generate_food(random.choice(list(FieldDrawing.food_image.keys())[1:]))
+                level.field.generate_food(random.choice(self.not_basic_food))
             level_drawing.draw()
             pygame.display.flip()
 
