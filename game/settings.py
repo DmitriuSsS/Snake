@@ -51,7 +51,7 @@ class Settings:
     @property
     def height_toolbar(self):
         """Высота панельки с жизнями в блоках"""
-        return int(self._global()['height_toolbar'])
+        return int(self._global()['height_toolbar']) * self.picture_size
 
     def picture(self, name: str):
         """Имя файла с изображением `name`"""

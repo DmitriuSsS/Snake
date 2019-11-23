@@ -11,7 +11,7 @@ settings = Settings()
 
 class Game:
     clock = pygame.time.Clock()
-    fps = 60
+    fps = 120
 
     _generate_food_location = None
 
@@ -46,8 +46,7 @@ class Game:
 
     not_basic_food = [Food(*t) for t in settings.not_basic_food]
 
-    def step_game(self, level: Level, tick, level_drawing: FieldDrawing):
-        # TODO: подумать над генерацией еды
+    def step_game(self, level: Level, tick, level_drawing):
         tick_move = self.fps // level.field.snake.speed
         if not tick_move or not tick % tick_move:
             level.step_snake(self._get_direction())
@@ -56,7 +55,7 @@ class Game:
             level_drawing.draw()
             pygame.display.flip()
 
-        if not (tick - 1) % 300:
+        if not (tick - 1) % (self.fps * 5):
             if self._generate_food_location in level.field.foods_location:
                 level.field.foods_location.pop(self._generate_food_location)
             self._generate_food_location = \
