@@ -7,8 +7,11 @@ from game.entities import Food
 from game.entities import Level
 from game.settings import Settings
 
-
 settings = Settings()
+
+__all__ = ['Button',
+           'Menu', 'WinWindow', 'WinFreeGameWindow', 'GameOverWindow',
+           'FieldDrawing', 'FreeGameDrawing', 'LevelDrawing']
 
 
 def _load_image(name):
@@ -190,38 +193,39 @@ class FieldDrawing:
         (Direction.DOWN, Direction.RIGHT): 90
     }
 
-    def __init__(self, field, path_to_bg):
+    def __init__(self, field, path_to_bg, surface):
         self.field = field
+        self.surface = surface
         self.bg = (pygame.image.load(path_to_bg)
                    if os.path.exists(path_to_bg)
                    else None)
 
-    def _draw_snake(self, surface):
+    def _draw_snake(self):
         pointer = 0
         prev_sp = None
         for sp in self.field.snake:
             location = (sp.location.y * self.size_cell,
                         sp.location.x * self.size_cell)
             if pointer == 0:
-                _draw_image(surface,
+                _draw_image(self.surface,
                             self.snake_head,
                             *location,
                             rotate_angle=self.dir_turn_angle_SBI[sp.direction])
 
             elif pointer == len(self.field.snake) - 1:
-                _draw_image(surface,
+                _draw_image(self.surface,
                             self.snake_tail,
                             *location,
                             rotate_angle=self.dir_turn_angle_SBI[prev_sp.direction])
 
             else:
                 if prev_sp.direction == sp.direction:
-                    _draw_image(surface,
+                    _draw_image(self.surface,
                                 self.snake_body,
                                 *location,
                                 rotate_angle=self.dir_turn_angle_SBI[sp.direction])
                 else:
-                    _draw_image(surface,
+                    _draw_image(self.surface,
                                 self.snake_turn,
                                 *location,
                                 rotate_angle=self.dir_turn_angle_STI[sp.direction, prev_sp.direction])
@@ -229,43 +233,43 @@ class FieldDrawing:
             prev_sp = sp
             pointer += 1
 
-    def _draw_food(self, surface):
+    def _draw_food(self):
         for location, food in self.field.foods_location.items():
             _draw_image(
-                surface,
+                self.surface,
                 self.food_image[food],
                 location.y * self.size_cell,
                 location.x * self.size_cell)
 
-    def _draw_walls(self, surface):
+    def _draw_walls(self):
         for location in self.field.walls:
             _draw_image(
-                surface,
+                self.surface,
                 self.wall,
                 location.y * self.size_cell,
                 location.x * self.size_cell)
 
-    def _draw_bg(self, surface):
+    def _draw_bg(self):
         if self.bg is not None:
-            surface.blit(self.bg, (0, 0))
+            self.surface.blit(self.bg, (0, 0))
         else:
-            surface.fill(pygame.Color('white'))
+            self.surface.fill(pygame.Color('white'))
 
-    def draw(self, surface):
-        self._draw_bg(surface)
-        self._draw_snake(surface)
-        self._draw_walls(surface)
-        self._draw_food(surface)
+    def draw(self):
+        self._draw_bg()
+        self._draw_snake()
+        self._draw_walls()
+        self._draw_food()
 
 
 class LevelDrawing(FieldDrawing):
     def __init__(self, level: Level, level_number: int, count_levels: int):
-        super().__init__(level.field, settings.background_image(level.name))
         self.delta_y = settings.height_toolbar
         self.surface = pygame.display.set_mode((self.size_cell * self.field.width,
                                                 self.size_cell * self.field.height + self.delta_y))
         self.field_surface = self.surface.subsurface(
             pygame.Rect(0, self.delta_y, self.surface.get_width(), self.surface.get_height() - self.delta_y))
+        super().__init__(level.field, settings.background_image(level.name), self.field_surface)
 
         self.level = level
         self.level_number = level_number
@@ -296,21 +300,19 @@ class LevelDrawing(FieldDrawing):
                             max((self.delta_y - s_rect.height) / 2, 8))
         self.surface.blit(lvl_surf, lvl_rect)
 
-    def draw(self, field_surface=None):
-        if field_surface is None:
-            field_surface = self.field_surface
-        super().draw(field_surface)
+    def draw(self):
+        super().draw()
         self._draw_toolbar()
 
 
 class FreeGameDrawing(FieldDrawing):
     def __init__(self, level: Level):
-        super().__init__(level.field, settings.background_image(level.name))
         self.delta_y = settings.height_toolbar
         self.surface = pygame.display.set_mode((self.size_cell * self.field.width,
                                                 self.size_cell * self.field.height + self.delta_y))
         self.field_surface = self.surface.subsurface(
             pygame.Rect(0, self.delta_y, self.surface.get_width(), self.surface.get_height() - self.delta_y))
+        super().__init__(level.field, settings.background_image(level.name), self.field_surface)
 
         self.level = level
 
@@ -325,8 +327,6 @@ class FreeGameDrawing(FieldDrawing):
         s_rect.topleft = (self.field.width * self.size_cell - s_rect.width) / 2, (self.delta_y - s_rect.height) / 2
         self.surface.blit(s_surf, s_rect)
 
-    def draw(self, field_surface=None):
-        if field_surface is None:
-            field_surface = self.field_surface
-        super().draw(field_surface)
+    def draw(self):
+        super().draw()
         self._draw_toolbar()

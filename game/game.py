@@ -1,5 +1,6 @@
 import random
 
+from game.entities import Food, Level
 from game.direction import *
 from game.drawing import *
 from game.settings import Settings
@@ -64,22 +65,20 @@ class Game:
             pygame.display.flip()
 
     def main_loop(self):
-        # TODO: изменить переход между окнами на менее костыльный
-        win = {
+        windows = {
             'menu': Menu,
-            'win level game': WinWindow,
+            'windows level game': WinWindow,
             'lose level game': GameOverWindow,
             'end of the free game': WinFreeGameWindow
         }
 
         pygame.display.set_caption('Snake Game')
         name_window = 'menu'
-        current_window = win[name_window]()
+        current_window = windows[name_window]()
 
         while True:
-            self.clock.tick(self.fps)
-            if type(current_window) is not win[name_window]:
-                current_window = win[name_window]()
+            if type(current_window) is not windows[name_window]:
+                current_window = windows[name_window]()
             current_window.draw()
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -100,7 +99,7 @@ class Game:
                             name_window = 'lose level game'
                             break
                     else:
-                        name_window = 'win level game'
+                        name_window = 'windows level game'
                 elif name_window == 'free game':
                     score = self.free_game_loop()
                     name_window = 'end of the free game'
