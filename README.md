@@ -8,10 +8,10 @@
 Просто кормите вашу змейку яблоками.
 
 В игре есть 4 вида яблок:
-* ![Обычное яблоко](https://github.com/DmitriuSsS/Snake/raw/dev/sprites/basic_apple.png) - Базовая еда
-* ![Ускоряющее яблоко](https://github.com/DmitriuSsS/Snake/raw/dev/sprites/high_speed_apple.png) - Ускоряющее яблоко (Ускоряет змейку)
-* ![Червивое яблоко](https://github.com/DmitriuSsS/Snake/raw/dev/sprites/wormy_apple.png) - Червивое яблоко (Уменьшает и замедляет змейку, также отнимает одно очко)
-* ![Золотое яблоко](https://github.com/DmitriuSsS/Snake/raw/dev/sprites/gold_apple.png) - Золотое яблоко (Даёт больше очков)
+* ![Обычное яблоко](https://github.com/DmitriuSsS/Snake/raw/master/sprites/basic_apple.png) - Базовая еда
+* ![Ускоряющее яблоко](https://github.com/DmitriuSsS/Snake/raw/master/sprites/high_speed_apple.png) - Ускоряющее яблоко (Ускоряет змейку)
+* ![Червивое яблоко](https://github.com/DmitriuSsS/Snake/raw/master/sprites/wormy_apple.png) - Червивое яблоко (Уменьшает и замедляет змейку, также отнимает одно очко)
+* ![Золотое яблоко](https://github.com/DmitriuSsS/Snake/raw/master/sprites/gold_apple.png) - Золотое яблоко (Даёт больше очков)
 
 !!!ОСТОРОЖНО: Эффекты от яблок сохраняются до конца игры/уровня!
 
