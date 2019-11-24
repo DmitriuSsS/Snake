@@ -73,6 +73,7 @@ class Game:
         }
 
         pygame.display.set_caption('Snake Game')
+        pygame.display.set_icon(pygame.image.load(settings.picture('icon')))
         name_window = 'menu'
         current_window = windows[name_window]()
 
