@@ -196,7 +196,7 @@ class TestLevel(unittest.TestCase):
             os.path.join('tests', 'data', 'maps_for_test', 'map3x3.txt'))
 
         self.assertTrue(self.equal_field(self.field, actual_field))
-        self.assertEquals(score, actual_max_score)
+        self.assertEqual(score, actual_max_score)
 
     def test_reset(self):
         self.level.step_snake()
