@@ -47,7 +47,7 @@ class Game:
 
     not_basic_food = [Food(*t) for t in settings.not_basic_food]
 
-    def step_game(self, level: Level, tick, level_drawing):
+    def step_game(self, level: Level, tick, level_drawing: GameDrawing):
         tick_move = self.fps // level.field.snake.speed
         if not tick_move or not tick % tick_move:
             level.step_snake(self._get_direction())
@@ -69,7 +69,7 @@ class Game:
             'menu': Menu,
             'windows level game': WinWindow,
             'lose level game': GameOverWindow,
-            'end of the free game': WinFreeGameWindow
+            'end of the free game': EndFreeGameWindow
         }
 
         pygame.display.set_caption('Snake Game')
@@ -103,6 +103,6 @@ class Game:
                 elif name_window == 'free game':
                     score = self.free_game_loop()
                     name_window = 'end of the free game'
-                    current_window = WinFreeGameWindow(score)
+                    current_window = EndFreeGameWindow(score)
 
             pygame.display.flip()

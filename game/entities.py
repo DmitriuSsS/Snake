@@ -29,13 +29,13 @@ class Food:
 
 
 class SnakePart:
-    def __init__(self, location: Vector, direction: Direction = Direction.RIGHT):
+    def __init__(self, location: Vector, direction: Direction):
         self.direction = direction
         self.location = location
 
 
 class Snake:
-    def __init__(self, body: list, speed: float = 13.0):
+    def __init__(self, body: list, speed: float = 14.0):
         """
         :param body: list[SnakePart], перечисленный в порядке head -> tail
         """

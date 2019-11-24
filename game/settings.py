@@ -48,11 +48,6 @@ class Settings:
         """Размер картинок"""
         return int(self._global()['size_picture'])
 
-    @property
-    def height_toolbar(self):
-        """Высота панельки с жизнями в блоках"""
-        return int(self._global()['height_toolbar']) * self.picture_size
-
     def picture(self, name: str):
         """Имя файла с изображением `name`"""
         name_image_file = self._config['PICTURES'].get(name, None)
