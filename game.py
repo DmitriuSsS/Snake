@@ -30,16 +30,59 @@ class Game:
         level = Level('free', 1)
         tick = 0
         level_drawing = FreeGameDrawing(level)
+        level_drawing.draw()
+        pygame.display.flip()
         while not level.game_over_flag:
             self.clock.tick(self.fps)
             self.step_game(level, tick, level_drawing)
             tick += 1
-        return level.score
 
-    def level_game_loop(self, name, health, level_number, total_number_levels):
+        window = EndFreeGameWindow(score=level.score)
+        run = True
+        while run:
+            window.draw()
+            pygame.display.flip()
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    exit()
+                elif e.type == pygame.MOUSEBUTTONUP:
+                    if window.buttons[0].is_pressed(e.pos):
+                        run = False
+                        break
+
+        return Menu()
+
+    def level_game_loop(self, health):
+        levels = settings.levels
+
+        for i in range(len(levels)):
+            health = self._level_game_loop(levels[i], health, i + 1, len(levels))
+            if not health:
+                window = GameOverWindow()
+                break
+        else:
+            window = WinWindow()
+
+        run = True
+        while run:
+            window.draw()
+            pygame.display.flip()
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    exit()
+                elif e.type == pygame.MOUSEBUTTONUP:
+                    if window.buttons[0].is_pressed(e.pos):
+                        run = False
+                        break
+
+        return Menu()
+
+    def _level_game_loop(self, name, health, level_number, total_number_levels):
         level = Level(name, health)
         tick = 0
         level_drawing = LevelDrawing(level, level_number, total_number_levels)
+        level_drawing.draw()
+        pygame.display.flip()
         while not level.win_flag and not level.game_over_flag:
             self.clock.tick(self.fps)
             self.step_game(level, tick, level_drawing)
@@ -66,21 +109,12 @@ class Game:
             pygame.display.flip()
 
     def main_loop(self):
-        windows = {
-            'menu': Menu,
-            'windows level game': WinWindow,
-            'lose level game': GameOverWindow,
-            'end of the free game': EndFreeGameWindow
-        }
-
         pygame.display.set_caption('Snake Game')
         pygame.display.set_icon(pygame.image.load(settings.picture('icon')))
-        name_window = 'menu'
-        current_window = windows[name_window]()
+        current_window = Menu()
+        name_window = ''
 
         while True:
-            if type(current_window) is not windows[name_window]:
-                current_window = windows[name_window]()
             current_window.draw()
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -90,20 +124,17 @@ class Game:
                         if button.is_pressed(e.pos):
                             name_window = button.href
                             break
-                if name_window == 'level game':
-                    levels = settings.levels
+                if name_window != '':
+                    if name_window == 'level game':
+                        current_window = self.level_game_loop(3)
+                    elif name_window == 'free game':
+                        current_window = self.free_game_loop()
 
-                    health = 3
-                    for i in range(len(levels)):
-                        health = self.level_game_loop(levels[i], health, i + 1, len(levels))
-                        if not health:
-                            name_window = 'lose level game'
-                            break
-                    else:
-                        name_window = 'windows level game'
-                elif name_window == 'free game':
-                    score = self.free_game_loop()
-                    name_window = 'end of the free game'
-                    current_window = EndFreeGameWindow(score)
+                    name_window = ''
 
             pygame.display.flip()
+
+
+if __name__ == '__main__':
+    game = Game()
+    game.main_loop()
