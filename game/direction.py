@@ -43,3 +43,8 @@ class TranslateDirection:
         pygame.K_UP: Direction.UP,
         pygame.K_DOWN: Direction.DOWN
     }
+
+    dir_for_move_cursor = {
+        pygame.K_RIGHT: Direction.RIGHT,
+        pygame.K_LEFT: Direction.LEFT
+    }

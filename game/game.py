@@ -86,9 +86,8 @@ class Game:
                 if e.type == pygame.QUIT:
                     exit()
                 elif e.type == pygame.MOUSEBUTTONUP:
-                    pos = pygame.mouse.get_pos()
                     for button in current_window.buttons:
-                        if button.is_pressed(pos):
+                        if button.is_pressed(e.pos):
                             name_window = button.href
                             break
                 if name_window == 'level game':
