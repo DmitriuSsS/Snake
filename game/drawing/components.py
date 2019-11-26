@@ -13,7 +13,7 @@ class Button:
                  width, height,
                  text, text_color=pygame.Color('black'),
                  button_color=pygame.Color('white'),
-                 href=None,
+                 handler=None,
                  name=None):
         self.parent_surface = parent_surface
         self.x = x
@@ -23,13 +23,17 @@ class Button:
         self.text = text
         self.text_color = text_color
         self.button_color = button_color
-        self.href = href
+        self._handler = handler
         self.name = text if name is None else name
         self._rect = pygame.Rect(x, y, width, height)
 
     def draw(self):
         self._draw_button()
         self._write_text()
+
+    def handler(self):
+        if self._handler is not None:
+            self._handler()
 
     def _get_size_for_calibri(self):
         # формула специально для шрифта Calibri в pygame
