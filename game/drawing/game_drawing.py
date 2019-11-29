@@ -3,8 +3,7 @@ import os
 import pygame
 
 from game.direction import Direction
-from game.entities import Food
-from game.entities import Level
+from game.entities import Food, Field, Level, Snake
 from game.settings import Settings
 
 settings = Settings()
@@ -221,3 +220,11 @@ class FreeGameDrawing(GameDrawing):
         s_rect.topleft = ((self.surface.get_width() - s_rect.width) / 2,
                           (self.delta_y - s_rect.height) / 2)
         self.surface.blit(s_surf, s_rect)
+
+
+class GameMakerDrawing(GameDrawing):
+    def __init__(self, width_filed, height_field, score_for_win):
+        self.field = Field(Snake([]), set(), (width_filed, height_field))
+        self.score_for_win = score_for_win
+
+    pass

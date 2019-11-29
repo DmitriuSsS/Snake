@@ -39,7 +39,7 @@ class Button:
         # формула специально для шрифта Calibri в pygame
         size_width = 8 * self.width // (5 * len(self.text)) - 1
         size_height = 2 * self.height // 3 - 1
-        return max(min(size_height, size_width), 1)
+        return int(max(min(size_height, size_width), 1))
 
     def _write_text(self):
         font_size = self._get_size_for_calibri()

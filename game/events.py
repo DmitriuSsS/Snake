@@ -2,7 +2,8 @@ import pygame
 
 __all__ = ['RedirectToMenu', 'RedirectToFreeGame', 'RedirectToLevelGame',
            'RedirectToGameOverWindow', 'RedirectToWinWindow',
-           'RedirectToEndFreeGameWindow']
+           'RedirectToEndFreeGameWindow', 'RedirectToSetGameMakerProperty',
+           'RedirectToGameMaker']
 
 
 class RedirectToMenu:
@@ -45,3 +46,18 @@ class RedirectToEndFreeGameWindow:
 
     def __init__(self, score):
         self.event = pygame.event.Event(pygame.USEREVENT, name=self.name, score=score)
+
+
+class RedirectToSetGameMakerProperty:
+    name = 'Redirect to SetGameMakerProperty'
+
+    def __init__(self):
+        self.event = pygame.event.Event(pygame.USEREVENT, name=self.name)
+
+
+class RedirectToGameMaker:
+    name = 'Redirect to GameMaker'
+
+    def __init__(self, width, height, score):
+        self.event = pygame.event.Event(pygame.USEREVENT, name=self.name,
+                                        width=width, height=height, score=score)

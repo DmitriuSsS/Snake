@@ -25,6 +25,12 @@ class Game:
                 if i.key in TranslateDirection.direction:
                     return TranslateDirection.direction[i.key]
 
+    def game_maker_loop(self, width_field, height_field, score_for_win):
+        # TODO: написать содержимое
+
+        redirect = RedirectToMenu()
+        pygame.event.post(redirect.event)
+
     def free_game_loop(self):
         level = Level('free', 1)
         level.max_score = len(level.field.not_walls_cells) - len(level.field.snake)
@@ -83,9 +89,6 @@ class Game:
 
         current_window = Menu()
         while True:
-            current_window.draw()
-            pygame.display.flip()
-
             for e in pygame.event.get():
                 if e.type == pygame.MOUSEBUTTONUP:
                     for button in current_window.buttons:
@@ -98,6 +101,8 @@ class Game:
                         self.free_game_loop()
                     elif e.name == RedirectToLevelGame.name:
                         self.level_game_loop(3)
+                    elif e.name == RedirectToGameMaker.name:
+                        self.game_maker_loop(e.width, e.height, e.score)
                     elif e.name == RedirectToMenu.name:
                         current_window = Menu()
                     elif e.name == RedirectToGameOverWindow.name:
@@ -106,3 +111,8 @@ class Game:
                         current_window = WinWindow()
                     elif e.name == RedirectToEndFreeGameWindow.name:
                         current_window = EndFreeGameWindow(e.score)
+                    elif e.name == RedirectToSetGameMakerProperty.name:
+                        current_window = GameMakerWindow()
+
+            current_window.draw()
+            pygame.display.flip()
