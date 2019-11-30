@@ -122,3 +122,8 @@ class Game:
 
             current_window.draw()
             pygame.display.flip()
+
+
+if __name__ == '__main__':
+    game = Game()
+    game.main_loop()
