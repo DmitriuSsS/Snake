@@ -1,6 +1,6 @@
 import random
 
-from game.entities import Food, Level
+from game.entities import Food, Level, Field, Snake
 from game.direction import *
 from game.drawing.windows import *
 from game.drawing.game_drawing import *
@@ -26,7 +26,13 @@ class Game:
                     return TranslateDirection.direction[i.key]
 
     def game_maker_loop(self, width_field, height_field, score_for_win):
-        # TODO: написать содержимое
+        # TODO: реализовать
+        field = Field(Snake([]), set(), (width_field, height_field))
+        level = Level(field=field, max_score=score_for_win)
+        game_maker_drawer = GameMakerDrawing(level)
+        while True:
+            game_maker_drawer.draw()
+            pygame.display.flip()
 
         redirect = RedirectToMenu()
         pygame.event.post(redirect.event)

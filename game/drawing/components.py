@@ -11,8 +11,8 @@ class Button:
                  parent_surface,
                  x, y,
                  width, height,
-                 text, text_color=pygame.Color('black'),
-                 button_color=pygame.Color('white'),
+                 text='', text_color=pygame.Color('black'),
+                 button_color=pygame.Color('white'), button_image=None,
                  handler=None,
                  name=None):
         self.parent_surface = parent_surface
@@ -21,15 +21,21 @@ class Button:
         self.height = height
         self.width = width
         self.text = text
-        self.text_color = text_color
-        self.button_color = button_color
+        self._text_color = text_color
+        self._button_color = button_color
+        self._image = button_image
+        if (isinstance(self._image, pygame.Surface)
+                and self._image.get_width() != width
+                and self._image.get_height() != height):
+            self._image = pygame.transform.scale(self._image, (width, height))
         self._handler = handler
         self.name = text if name is None else name
         self._rect = pygame.Rect(x, y, width, height)
 
     def draw(self):
         self._draw_button()
-        self._write_text()
+        if self.text:
+            self._write_text()
 
     def handler(self):
         if self._handler is not None:
@@ -44,18 +50,22 @@ class Button:
     def _write_text(self):
         font_size = self._get_size_for_calibri()
         font = pygame.font.SysFont("Calibri", font_size)
-        text = font.render(self.text, True, self.text_color)
+        text = font.render(self.text, True, self._text_color)
         self.parent_surface.blit(text,
                                  (self.x + (self.width - text.get_width()) / 2,
                                   self.y + (self.height - text.get_height()) / 2))
 
     def _draw_button(self):
         width_circle = min(self.height, self.width) // 20
-        color = self.button_color // pygame.Color(2, 2, 2, 255)
-        color.a = self.button_color.a
+        color = self._button_color // pygame.Color(2, 2, 2, 255)
+        color.a = self._button_color.a
 
-        pygame.draw.rect(self.parent_surface, self.button_color,
-                         (self.x, self.y, self.width, self.height))
+        if not self._image:
+            pygame.draw.rect(self.parent_surface, self._button_color,
+                             (self.x, self.y, self.width, self.height))
+        else:
+            rect_image = self._image.get_rect(topleft=(self.x, self.y))
+            self.parent_surface.blit(self._image, rect_image)
 
         # обводка прямоугольника (кнопки)
         points = [(self.x, self.y),

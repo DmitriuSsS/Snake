@@ -138,8 +138,8 @@ class GameMakerWindow:
                                          self._height_block -
                                          self._height_button_plus - 5)
 
-        self._height = 5
-        self._width = 5
+        self._height = 10
+        self._width = 10
         self._score_for_win = 5
 
     def draw(self):
@@ -167,24 +167,27 @@ class GameMakerWindow:
     def _add_plus_minus_buttons(self, name_arg, y):
         x = 10
         button_size = (30, self._height_button_plus)
+        border = [10, 100]
+        if name_arg == 'score':
+            border[0] = 5
         buttons = [Button(self.surface, x, y, *button_size, '-10',
-                          handler=self._change_arg(name_arg, -10)),
+                          handler=self._change_arg(name_arg, -10, *border)),
                    Button(self.surface, x + button_size[0] + 5, y, *button_size, '--',
-                          handler=self._change_arg(name_arg, -1)),
+                          handler=self._change_arg(name_arg, -1, *border)),
                    Button(self.surface, self.surface.get_width() - x - 2 * button_size[0] - 5, y,
                           *button_size, '+',
-                          handler=self._change_arg(name_arg, 1)),
+                          handler=self._change_arg(name_arg, 1, *border)),
                    Button(self.surface, self.surface.get_width() - x - button_size[0], y,
                           *button_size, '+10',
-                          handler=self._change_arg(name_arg, 10))]
+                          handler=self._change_arg(name_arg, 10, *border))]
         self.buttons += buttons
 
-    def _change_arg(self, name_arg, value_change):
+    def _change_arg(self, name_arg, value_change, left_border, right_border):
         """
         :param name_arg: [score, width, height]
         :return: func
         """
-        left_border, right_border = 5, 100
+
         def _change():
             if name_arg == 'score':
                 temp_score = self._score_for_win + value_change
@@ -207,8 +210,9 @@ class GameMakerWindow:
         """
         text = name_arg
         if name_arg == 'score':
-            text += ' for win'
-        text += f'(5 <= {name_arg[0]} <= 100)'
+            text += ' for win(5 <= s <= 100)'
+        else:
+            text += f'(10 <= {name_arg[0]} <= 100)'
 
         y = self._y_for_block[name_arg]
         font = pygame.font.SysFont("Calibri", 17)

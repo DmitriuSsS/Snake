@@ -165,13 +165,19 @@ class Level:
         field = Field(Snake(snake), walls, (width_field, height_field))
         return field, max_score
 
-    def __init__(self, level_name, health):
+    def __init__(self, level_name: str = None, health: int = 3,
+                 field: Field = None, max_score: int = 5):
+        if level_name is None and field is None:
+            raise Exception('Имя уровня и поле оба были None')
         self.win_flag = False
         self.game_over_flag = False
-        self.name = level_name
         self.health = health
-        (self.field, self.max_score) = self.parse_map(settings.map_file(level_name))
-        self.field.generate_food()
+        self.name = ''
+        if level_name:
+            (self.field, self.max_score) = self.parse_map(settings.map_file(level_name))
+            self.name = level_name
+        else:
+            self.field, self.max_score = field, max_score
         self.old_snake = deepcopy(self.field.snake)
         self.score = 0
 
