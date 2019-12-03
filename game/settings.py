@@ -7,6 +7,7 @@ from os.path import join
 class Settings:
     def __init__(self, filename='settings.ini'):
         """Чтение настроек"""
+        self.filename = filename
         self._config = configparser.ConfigParser(default_section='')
         self._config.optionxform = str
         self._config.read(filename, encoding='utf8')
@@ -16,6 +17,14 @@ class Settings:
 
     def _level(self):
         return self._config['LEVEL']
+
+    def add_level(self, level_name: str):
+        levels = self._config['LEVELS']
+        # self._config.set('LEVELS', value=levels.update([(f'lvl{len(levels)}', level_name)]))
+        self._config.set('LEVELS', f'lvl{len(levels)}', level_name)
+
+        with open(self.filename, 'w') as configfile:
+            self._config.write(configfile)
 
     @staticmethod
     def _parse_food_characteristics(string: str):

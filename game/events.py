@@ -3,7 +3,8 @@ import pygame
 __all__ = ['RedirectToMenu', 'RedirectToFreeGame', 'RedirectToLevelGame',
            'RedirectToGameOverWindow', 'RedirectToWinWindow',
            'RedirectToEndFreeGameWindow', 'RedirectToSetGameMakerProperty',
-           'RedirectToGameMaker', 'PickEraser', 'PickSnake', 'PickWall']
+           'RedirectToGameMaker', 'PickEraser', 'PickSnake', 'PickWall',
+           'Save']
 
 
 class RedirectToMenu:
@@ -70,7 +71,6 @@ class PickWall:
         self.event = pygame.event.Event(pygame.USEREVENT, name=self.name)
 
 
-# TODO: перевести слово ластик
 class PickEraser:
     name = 'Pick Eraser'
 
@@ -80,6 +80,14 @@ class PickEraser:
 
 class PickSnake:
     name = 'Pick Snake'
+
+    def __init__(self, direction):
+        self.event = pygame.event.Event(pygame.USEREVENT, name=self.name,
+                                        direction=direction)
+
+
+class Save:
+    name = 'Save'
 
     def __init__(self):
         self.event = pygame.event.Event(pygame.USEREVENT, name=self.name)

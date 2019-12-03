@@ -1,5 +1,6 @@
 import random
 from copy import deepcopy, copy
+from typing import List
 
 from game.direction import *
 from game.service_entities.queue import Queue
@@ -102,6 +103,17 @@ class Snake:
     def __len__(self):
         return len(self.body)
 
+    def __contains__(self, item):
+        if type(item) is Vector:
+            for part in self:
+                if part.location == item:
+                    return True
+        if type(type) is SnakePart:
+            for part in self:
+                if item == part:
+                    return True
+        return False
+
 
 class Field:
     def __init__(self, snake: Snake, walls: set, size_field: tuple):
@@ -140,6 +152,26 @@ class Field:
 
 
 class Level:
+    @staticmethod
+    def anti_parse_map(field: Field, max_score: int) -> List[str]:
+        """
+        :return: строки карты
+        """
+        result = []
+
+        for i in range(field.height):
+            line = []
+            for j in range(field.width):
+                line.append('#' if Vector(j, i) in field.walls else ' ')
+            result.append(''.join(line))
+
+        result.append(TranslateDirection.dir_word[field.snake.head.direction])
+        for part in field.snake:
+            result.append(f'{part.location.x} {part.location.y}')
+
+        result.append(str(max_score))
+        return result
+
     @staticmethod
     def parse_map(map_path: str) -> (Field, int):
         walls = set()

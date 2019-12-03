@@ -1,5 +1,6 @@
 import os
 
+from tkinter import *
 from tkinter import filedialog as fd
 
 import pygame
@@ -8,7 +9,7 @@ from game.direction import Direction
 from game.drawing.components import Button
 from game.entities import Food, Level
 from game.settings import Settings
-from game.events import PickWall, PickSnake, PickEraser
+from game.events import PickWall, PickSnake, PickEraser, Save
 
 settings = Settings()
 
@@ -229,12 +230,12 @@ class FreeGameDrawing(GameDrawing):
 
 
 class GameMakerDrawing(GameDrawing):
-    # TODO: дореализовать
     def __init__(self, level: Level):
         super().__init__(level, delta_x=110)
 
-        self.mode = 'create'
+        self.mode = 'grid'
         self.active_button = None
+        self.direction_snake = Direction.RIGHT
 
         size_buttons = (45, 25)
         self._height_header = 25
@@ -244,11 +245,11 @@ class GameMakerDrawing(GameDrawing):
         # создаю изображение змейки для кнопки
         snake_image = pygame.Surface((self.size_cell * 3, self.size_cell))
         _draw_image(snake_image, self.field_drawer.snake_tail, 0, 0,
-                    self.field_drawer.dir_turn_angle_SBI[Direction.RIGHT])
+                    self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
         _draw_image(snake_image, self.field_drawer.snake_body, 0, self.size_cell,
-                    self.field_drawer.dir_turn_angle_SBI[Direction.RIGHT])
+                    self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
         _draw_image(snake_image, self.field_drawer.snake_head, 0, 2 * self.size_cell,
-                    self.field_drawer.dir_turn_angle_SBI[Direction.RIGHT])
+                    self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
         snake_image.set_colorkey(pygame.Color('black'))
 
         self.buttons_components = [Button(self.surface,
@@ -284,7 +285,8 @@ class GameMakerDrawing(GameDrawing):
         self.buttons_redirect = [Button(self.surface,
                                         size_buttons[0] + 15, self.surface.get_height() - 5 - size_buttons[1],
                                         *size_buttons,
-                                        text='Save')]
+                                        text='Save',
+                                        handler=self._save_level)]
 
         self.button_change_mode = Button(self.surface,
                                          5, self.surface.get_height() - 5 - size_buttons[1],
@@ -312,7 +314,7 @@ class GameMakerDrawing(GameDrawing):
                 break
 
     def _handle_pick_snake(self):
-        pick = PickSnake()
+        pick = PickSnake(self.direction_snake)
         pygame.event.post(pick.event)
         for button in self.buttons_components:
             if button.name == 'snake':
@@ -320,20 +322,50 @@ class GameMakerDrawing(GameDrawing):
                 break
 
     def _handle_change_mode(self):
-        if self.mode == 'create':
+        if self.mode == 'grid':
             self.mode = 'preview'
-            self.button_change_mode.text = 'Create'
+            self.button_change_mode.text = 'Grid'
         else:
-            self.mode = 'create'
+            self.mode = 'grid'
             self.button_change_mode.text = 'Preview'
 
     def _handle_pick_bg(self):
-        file_name = fd.askopenfilename(filetypes=("PNG files", "*.png"))
+        root = Tk()
+        root.withdraw()
+        root.update()
+        file_name = fd.askopenfilename(filetypes=[("image files", "*.png")])
+        root.destroy()
         if file_name:
             self.field_drawer.bg = pygame.image.load(file_name)
+            if (self.field_drawer.bg.get_width() != self.field_drawer.surface.get_width()
+                    or self.field_drawer.bg.get_height() != self.field_drawer.surface.get_height()):
+                self.field_drawer.bg = pygame.transform.scale(self.field_drawer.bg,
+                                                              (self.field_drawer.surface.get_width(),
+                                                               self.field_drawer.surface.get_height()))
 
     def _skip_bg(self):
         self.field_drawer.bg = None
+
+    def _save_level(self):
+        if len(self.level.field.snake) == 3:
+            field = self.level.field
+            score_for_win = self.level.max_score
+
+            _map = Level.anti_parse_map(field, score_for_win)
+            count_levels = len(os.listdir(settings.levels_dir)) - 1
+            level_name = f'level_{count_levels}'
+            os.mkdir(os.path.join(settings.levels_dir, level_name))
+            with open(settings.map_file(level_name), 'w+', newline='\r\n') as file:
+                file.writelines(list(map(lambda x: x + '\r\n', _map[:-1])) + [_map[-1]])
+
+            bg = self.field_drawer.bg
+            if bg is not None:
+                pygame.image.save(bg, settings.background_image(level_name))
+
+            settings.add_level(level_name)
+
+            redirect = Save()
+            pygame.event.post(redirect.event)
 
     def _draw_toolbar(self):
         pygame.draw.rect(self.surface, pygame.Color('0x000080'),
@@ -371,7 +403,7 @@ class GameMakerDrawing(GameDrawing):
     def draw(self):
         super().draw()
 
-        if self.mode == 'create':
+        if self.mode == 'grid':
             color_circle = pygame.Color('grey')
             for i in range(self.level.field.width):
                 x = self.delta_x + (i + 1) * self.size_cell

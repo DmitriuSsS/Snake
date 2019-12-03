@@ -37,6 +37,13 @@ class TranslateDirection:
         'down': Direction.DOWN
     }
 
+    dir_word = {
+        Direction.RIGHT: 'right',
+        Direction.LEFT: 'left',
+        Direction.UP: 'up',
+        Direction.DOWN: 'down'
+    }
+
     direction = {
         pygame.K_RIGHT: Direction.RIGHT,
         pygame.K_LEFT: Direction.LEFT,
