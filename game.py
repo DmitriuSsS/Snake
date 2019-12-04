@@ -181,9 +181,9 @@ class Game:
                     elif e.name == RedirectToMenu.name:
                         current_window = Menu()
                     elif e.name == RedirectToGameOverWindow.name:
-                        current_window = GameOverWindow()
+                        current_window = GameOverWindow('Game Over :(')
                     elif e.name == RedirectToWinWindow.name:
-                        current_window = WinWindow()
+                        current_window = GameOverWindow('You Win!')
                     elif e.name == RedirectToEndFreeGameWindow.name:
                         current_window = EndFreeGameWindow(e.score)
                     elif e.name == RedirectToSetGameMakerProperty.name:

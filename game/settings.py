@@ -20,7 +20,6 @@ class Settings:
 
     def add_level(self, level_name: str):
         levels = self._config['LEVELS']
-        # self._config.set('LEVELS', value=levels.update([(f'lvl{len(levels)}', level_name)]))
         self._config.set('LEVELS', f'lvl{len(levels)}', level_name)
 
         with open(self.filename, 'w') as configfile:

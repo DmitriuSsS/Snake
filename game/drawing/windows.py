@@ -2,21 +2,57 @@ import pygame
 from game.drawing.components import *
 from game.events import *
 
-__all__ = ['Menu', 'WinWindow', 'GameOverWindow',
-           'EndFreeGameWindow', 'GameMakerWindow']
+__all__ = ['Menu', 'GameOverWindow', 'EndFreeGameWindow', 'GameMakerWindow']
 
 
 class Menu:
     def __init__(self):
-        self.surface = pygame.display.set_mode((200, 160))
-        self.buttons = [Button(self.surface, 20, 10, 160, 40, 'Game with Levels',
-                               handler=self._redirect_to_level_game),
-                        Button(self.surface, 20, 60, 160, 40, 'Free game',
-                               handler=self._redirect_to_free_game),
-                        Button(self.surface, 20, 110, 75, 40, 'GM',
-                               handler=self._redirect_to_game_maker),
-                        Button(self.surface, 105, 110, 75, 40, 'Exit',
-                               handler=self._exit)]
+        self._size_window = (200, 160)
+
+        # region настройка расположения и размеров кнопок
+        delta_x = 20
+        distance_between_buttons = 10
+        height_buttons = (self._size_window[1] - 4 * distance_between_buttons) // 3
+
+        self._rect_button_level_game = pygame.Rect(
+            delta_x,
+            distance_between_buttons,
+            self._size_window[0] - 2 * delta_x,
+            height_buttons
+        )
+
+        self._rect_button_free_game = self._rect_button_level_game.copy()
+        self._rect_button_free_game.y = (self._rect_button_level_game.bottom +
+                                         distance_between_buttons)
+
+        width_button_game_maker = (self._size_window[0] - 2 * delta_x - distance_between_buttons) // 2
+        self._rect_button_game_maker = pygame.Rect(
+            delta_x,
+            self._rect_button_free_game.bottom + distance_between_buttons,
+            width_button_game_maker,
+            height_buttons
+        )
+
+        self._rect_button_exit = self._rect_button_game_maker.copy()
+        self._rect_button_exit.x = self._rect_button_game_maker.right + distance_between_buttons
+
+        # endregion
+
+        self.surface = pygame.display.set_mode(self._size_window)
+        self.buttons = [
+            Button(self.surface, self._rect_button_level_game,
+                   text='Game with Levels',
+                   handler=self._redirect_to_level_game),
+            Button(self.surface, self._rect_button_free_game,
+                   text='Free game',
+                   handler=self._redirect_to_free_game),
+            Button(self.surface, self._rect_button_game_maker,
+                   text='GM',
+                   handler=self._redirect_to_game_maker),
+            Button(self.surface, self._rect_button_exit,
+                   text='Exit',
+                   handler=self._exit)
+        ]
 
     def draw(self):
         self.surface.fill(pygame.Color('white'))
@@ -43,37 +79,44 @@ class Menu:
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
 
-class WinWindow:
-    def __init__(self):
-        self.surface = pygame.display.set_mode((200, 160))
-        self.buttons = [Button(self.surface, 20, 100, 160, 40, 'OK',
-                               handler=self._redirect_to_menu)]
-
-    def draw(self):
-        self.surface.fill(pygame.Color('white'))
-        font_win = pygame.font.SysFont("Calibri", 40)
-        text_win = font_win.render('You WIN!', True, pygame.Color('black'))
-        self.surface.blit(text_win, ((self.surface.get_width() - text_win.get_width()) / 2, 30))
-        for button in self.buttons:
-            button.draw()
-
-    @staticmethod
-    def _redirect_to_menu():
-        redirect = RedirectToMenu()
-        pygame.event.post(redirect.event)
-
-
 class GameOverWindow:
-    def __init__(self):
-        self.surface = pygame.display.set_mode((200, 160))
-        self.buttons = [Button(self.surface, 20, 100, 160, 40, 'OK',
+    def __init__(self, message):
+        self._size_window = (200, 160)
+
+        # region настройка размеров и положения кнопок и текста
+
+        self._indent_from_edges = 20
+        self._rect_button_redirect_to_menu = pygame.Rect(
+            self._indent_from_edges,
+            self._size_window[1] * 3 // 4 - self._indent_from_edges,
+            self._size_window[0] - 2 * self._indent_from_edges,
+            self._size_window[1] // 4
+        )
+
+        height_text = self._rect_button_redirect_to_menu.top - 2 * self._indent_from_edges
+        self._text = message
+        self._font = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                self._size_window[0] - 2 * self._indent_from_edges,
+                height_text,
+                self._text
+            )
+        )
+
+        # endregion
+
+        self._bg_color = pygame.Color('white')
+        self._text_color = pygame.Color('black')
+
+        self.surface = pygame.display.set_mode(self._size_window)
+        self.buttons = [Button(self.surface, self._rect_button_redirect_to_menu, 'OK',
                                handler=self._redirect_to_menu)]
 
     def draw(self):
-        self.surface.fill(pygame.Color('white'))
-        font_lose = pygame.font.SysFont("Calibri", 30)
-        text_lose = font_lose.render('Game Over :(', True, pygame.Color('black'))
-        self.surface.blit(text_lose, ((self.surface.get_width() - text_lose.get_width()) / 2, 30))
+        self.surface.fill(self._bg_color)
+        text_lose = self._font.render(self._text, True, self._text_color)
+        self.surface.blit(text_lose, ((self.surface.get_width() - text_lose.get_width()) / 2, self._indent_from_edges))
         for button in self.buttons:
             button.draw()
 
@@ -85,20 +128,65 @@ class GameOverWindow:
 
 class EndFreeGameWindow:
     def __init__(self, score):
-        self.score = score
-        self.surface = pygame.display.set_mode((200, 160))
-        self.buttons = [Button(self.surface, 20, 100, 160, 40, 'OK',
+        self._size_window = (200, 160)
+
+        # region настройка размеров и положения кнопок и текста
+
+        self._indent_from_edges = 20
+        self._indent_between_components = 10
+
+        self._rect_button_redirect_to_menu = pygame.Rect(
+            self._indent_from_edges,
+            self._size_window[1] * 3 // 4 - self._indent_from_edges,
+            self._size_window[0] - 2 * self._indent_from_edges,
+            self._size_window[1] // 4
+        )
+
+        self._text_header = 'End of the Game'
+        self._text_score = f'Score: {score}'
+        height_text = self._rect_button_redirect_to_menu.top - self._indent_from_edges - self._indent_between_components
+        title_space = 0.65
+        height_header = int(title_space * height_text)
+        height_text_score = int((1 - title_space) * height_text)
+
+        self._font_header = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                self._size_window[0] - 2 * self._indent_from_edges,
+                height_header,
+                self._text_header
+            )
+        )
+
+        self._font_text_score = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                int((self._size_window[0] - 2 * self._indent_from_edges) * 0.6),
+                height_text_score,
+                self._text_score
+            )
+        )
+
+        # endregion
+
+        self._bg_color = pygame.Color('white')
+        self._text_color = pygame.Color('black')
+
+        self.surface = pygame.display.set_mode(self._size_window)
+        self.buttons = [Button(self.surface, self._rect_button_redirect_to_menu,
+                               text='OK',
                                handler=self._redirect_to_menu)]
 
     def draw(self):
-        self.surface.fill(pygame.Color('white'))
-        font_win = pygame.font.SysFont("Calibri", 25)
-        text_win = font_win.render('End of the Game', True, pygame.Color('black'))
-        self.surface.blit(text_win, ((self.surface.get_width() - text_win.get_width()) / 2, 20))
+        self.surface.fill(self._bg_color)
+        text_win = self._font_header.render(self._text_header, True, self._text_color)
+        self.surface.blit(text_win, ((self.surface.get_width() - text_win.get_width()) / 2, self._indent_from_edges))
 
-        font_score = pygame.font.SysFont("Calibri", 20)
-        text_score = font_score.render(f'Score: {self.score}', True, pygame.Color('black'))
-        self.surface.blit(text_score, ((self.surface.get_width() - text_score.get_width()) / 2, 50))
+        text_score = self._font_text_score.render(self._text_score, True, self._text_color)
+        self.surface.blit(text_score, (
+            (self.surface.get_width() - text_score.get_width()) / 2,
+            self._indent_from_edges + text_win.get_rect().height + self._indent_between_components)
+        )
         for button in self.buttons:
             button.draw()
 
@@ -107,6 +195,8 @@ class EndFreeGameWindow:
         redirect = RedirectToMenu()
         pygame.event.post(redirect.event)
 
+
+# TODO: дорефакторить
 
 class GameMakerWindow:
     def __init__(self):
