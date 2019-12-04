@@ -43,7 +43,6 @@ class Game:
         return Snake(snake)
 
     def game_maker_loop(self, width_field, height_field, score_for_win):
-        # TODO: реализовать
         field = Field(Snake([]), set(), (width_field, height_field))
         level = Level(field=field, max_score=score_for_win)
         game_maker_drawer = GameMakerDrawing(level)
@@ -165,7 +164,7 @@ class Game:
         current_window = Menu()
         while True:
             for e in pygame.event.get():
-                if e.type == pygame.MOUSEBUTTONUP:
+                if e.type == pygame.MOUSEBUTTONDOWN:
                     for button in current_window.buttons:
                         if button.is_pressed(e.pos):
                             button.handler()

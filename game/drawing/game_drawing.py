@@ -253,44 +253,44 @@ class GameMakerDrawing(GameDrawing):
         snake_image.set_colorkey(pygame.Color('black'))
 
         self.buttons_components = [Button(self.surface,
-                                          x, self._height_header,
-                                          *self._size_buttons_components,
+                                          pygame.Rect(x, self._height_header,
+                                          *self._size_buttons_components),
                                           button_image=self.field_drawer.wall,
                                           name='wall',
                                           handler=self._handle_pick_wall),
                                    Button(self.surface,
-                                          x, self._height_header + 5 + self._size_buttons_components[1],
-                                          *self._size_buttons_components,
+                                          pygame.Rect(x, self._height_header + 5 + self._size_buttons_components[1],
+                                          *self._size_buttons_components),
                                           button_color=pygame.Color('white'),
                                           name='eraser',
                                           handler=self._handle_pick_eraser),
                                    Button(self.surface,
-                                          x - 14,
+                                          pygame.Rect(x - 14,
                                           self._height_header + 10 + 2 * self._size_buttons_components[1],
-                                          snake_image.get_width(), snake_image.get_height(),
+                                          snake_image.get_width(), snake_image.get_height()),
                                           button_image=snake_image,
                                           name='snake',
                                           handler=self._handle_pick_snake),
                                    Button(self.surface,
-                                          5, self._height_header + 15 + 3 * self._size_buttons_components[1],
-                                          self.delta_x - 10, 17,
+                                          pygame.Rect(5, self._height_header + 15 + 3 * self._size_buttons_components[1],
+                                          self.delta_x - 10, 17),
                                           text='Back Ground',
                                           handler=self._handle_pick_bg),
                                    Button(self.surface,
-                                          5, self._height_header + 35 + 3 * self._size_buttons_components[1],
-                                          self.delta_x - 10, 17,
+                                          pygame.Rect(5, self._height_header + 35 + 3 * self._size_buttons_components[1],
+                                          self.delta_x - 10, 17),
                                           text='Skip Back Ground',
                                           handler=self._skip_bg)]
 
         self.buttons_redirect = [Button(self.surface,
-                                        size_buttons[0] + 15, self.surface.get_height() - 5 - size_buttons[1],
-                                        *size_buttons,
+                                        pygame.Rect(size_buttons[0] + 15, self.surface.get_height() - 5 - size_buttons[1],
+                                        *size_buttons),
                                         text='Save',
                                         handler=self._save_level)]
 
         self.button_change_mode = Button(self.surface,
-                                         5, self.surface.get_height() - 5 - size_buttons[1],
-                                         *size_buttons,
+                                         pygame.Rect(5, self.surface.get_height() - 5 - size_buttons[1],
+                                         *size_buttons),
                                          name='mode',
                                          text='Preview',
                                          handler=self._handle_change_mode)
@@ -355,8 +355,10 @@ class GameMakerDrawing(GameDrawing):
             count_levels = len(os.listdir(settings.levels_dir)) - 1
             level_name = f'level_{count_levels}'
             os.mkdir(os.path.join(settings.levels_dir, level_name))
-            with open(settings.map_file(level_name), 'w+', newline='\r\n') as file:
-                file.writelines(list(map(lambda x: x + '\r\n', _map[:-1])) + [_map[-1]])
+            with open(settings.map_file(level_name), 'w+') as file:
+                for i in range(len(_map) - 1):
+                    file.write(_map[i] + '\n')
+                file.write(_map[-1])
 
             bg = self.field_drawer.bg
             if bg is not None:
@@ -387,15 +389,7 @@ class GameMakerDrawing(GameDrawing):
 
         if self.active_button is not None:
             button = self.active_button
-            x = button.x - 1
-            y = button.y - 1
-            points = [(x, y),
-                      (x, button.y + button.height),
-                      (button.x + button.width, button.y + button.height),
-                      (button.x + button.width, y)]
-            for i in range(len(points)):
-                pygame.draw.line(self.surface, pygame.Color('0x75bbfd'),
-                                 points[i - len(points)], points[i + 1 - len(points)], 3)
+            pygame.draw.rect(self.surface, pygame.Color('0x75bbfd'), button.rect, 3)
 
         for button in self.buttons:
             button.draw()

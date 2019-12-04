@@ -16,13 +16,15 @@ def get_size_for_calibri(width: int, height: int, text: str) -> int:
 
 class Button:
     def __init__(self,
-                 parent_surface,
+                 parent_surface: pygame.Surface,
                  rect: pygame.Rect,
                  text='', text_color=pygame.Color('black'),
                  button_color=pygame.Color('white'), button_image=None,
+                 width_circle: int = None,
                  handler=None,
                  name=None):
         self.parent_surface = parent_surface
+        self._width_circle = width_circle
         self.text = text
         self._text_color = text_color
         self._button_color = button_color
@@ -45,18 +47,22 @@ class Button:
             self._handler()
 
     def _write_text(self):
-        font_size = get_size_for_calibri(self._rect.width * 4 // 5, self._rect.height * 4 // 5, self.text)
-        font = pygame.font.SysFont("Calibri", font_size)
-        text = font.render(self.text, True, self._text_color)
-        x, y = self._rect.x, self._rect.y
-        button_width, button_height = self._rect.width, self._rect.height
+        if self.text:
+            font_size = get_size_for_calibri(self._rect.width * 4 // 5, self._rect.height * 4 // 5, self.text)
+            font = pygame.font.SysFont("Calibri", font_size)
+            text = font.render(self.text, True, self._text_color)
+            x, y = self._rect.x, self._rect.y
+            button_width, button_height = self._rect.width, self._rect.height
 
-        self.parent_surface.blit(text,
-                                 (x + (button_width - text.get_width()) / 2,
-                                  y + (button_height - text.get_height()) / 2))
+            self.parent_surface.blit(text,
+                                     (x + (button_width - text.get_width()) / 2,
+                                      y + (button_height - text.get_height()) / 2))
 
     def _draw_button(self):
-        width_circle = min(self._rect.height, self._rect.width) // 20
+        if self._width_circle is None:
+            width_circle = min(self._rect.height, self._rect.width) // 20
+        else:
+            width_circle = self._width_circle
         color = self._button_color // pygame.Color(2, 2, 2, 255)
         color.a = self._button_color.a
 
@@ -66,7 +72,12 @@ class Button:
             rect_image = self._image.get_rect(topleft=self._rect.topleft)
             self.parent_surface.blit(self._image, rect_image)
 
-        pygame.draw.rect(self.parent_surface, color, self._rect, width_circle)
+        if width_circle:
+            pygame.draw.rect(self.parent_surface, color, self._rect, width_circle)
+
+    @property
+    def rect(self):
+        return self._rect.copy()
 
     def is_pressed(self, mouse):
         return (self._rect.topleft[0] < mouse[0] < self._rect.bottomright[0]

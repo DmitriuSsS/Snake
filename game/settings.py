@@ -1,6 +1,6 @@
 """Модуль настроек игры"""
 import configparser
-from copy import deepcopy
+from copy import deepcopy, copy
 from os.path import join
 
 
@@ -36,6 +36,10 @@ class Settings:
     @property
     def food(self) -> list:
         return list(self._food().values())
+
+    @property
+    def basic_food(self):
+        return copy(self._food()['basic_apple'])
 
     @property
     def not_basic_food(self) -> list:

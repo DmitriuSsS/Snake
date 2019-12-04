@@ -88,6 +88,3 @@ class TestQueue(unittest.TestCase):
         q.enqueue(4)
         self.assertEqual(1, q.dequeue())
         self.assertEqual(4, q.dequeue())
-
-
-

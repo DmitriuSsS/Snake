@@ -132,7 +132,7 @@ class Field:
     def is_crash(self):
         return self.snake.check_intersection(self.walls)
 
-    def generate_food(self, food: Food = Food()):
+    def generate_food(self, food: Food = Food(*settings.basic_food)):
         loc = set([e.location for e in self.snake.body]).union(self.foods_location.keys())
         empty_cells = self.not_walls_cells - loc
         location = random.choice(list(empty_cells))
@@ -162,7 +162,7 @@ class Level:
         for i in range(field.height):
             line = []
             for j in range(field.width):
-                line.append('#' if Vector(j, i) in field.walls else ' ')
+                line.append(settings.wall_symbol if Vector(j, i) in field.walls else settings.empty_symbol)
             result.append(''.join(line))
 
         result.append(TranslateDirection.dir_word[field.snake.head.direction])
@@ -232,7 +232,7 @@ class Level:
         if self.field.is_crash() or len(self.field.snake) <= 1:
             self.lose()
         if self.field.snake.head.location in self.field.foods_location:
-            if self.field.foods_location[self.field.snake.head.location] == Food():
+            if self.field.foods_location[self.field.snake.head.location] == Food(*settings.basic_food):
                 self.field.generate_food()
             self.eat_food()
         if self.score >= self.max_score:
