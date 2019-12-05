@@ -53,10 +53,10 @@ class Button:
             text = font.render(self.text, True, self._text_color)
             x, y = self._rect.x, self._rect.y
             button_width, button_height = self._rect.width, self._rect.height
-
-            self.parent_surface.blit(text,
-                                     (x + (button_width - text.get_width()) / 2,
-                                      y + (button_height - text.get_height()) / 2))
+            rect_text = text.get_rect()
+            rect_text.centerx = x + button_width / 2
+            rect_text.centery = y + button_height / 2
+            self.parent_surface.blit(text, rect_text)
 
     def _draw_button(self):
         if self._width_circle is None:

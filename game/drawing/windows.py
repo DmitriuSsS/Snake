@@ -246,9 +246,9 @@ class GameMakerWindow:
         )
 
         self._border_for_value = {
-            'score': [5, 100],
-            'width': [10, 100],
-            'height': [10, 100]
+            'score': [5, 40],
+            'width': [10, 40],
+            'height': [10, 40]
         }
 
         self._header_for_value = {
@@ -321,8 +321,7 @@ class GameMakerWindow:
         self.surface.fill(self._bg_color)
         render_text = self._font_heading.render(self._text_heading, True, self._text_color)
         rect = render_text.get_rect()
-        rect.centerx = self.surface.get_width() / 2
-        rect.centery = self._height_heading / 2
+        rect.center = (self.surface.get_width() / 2, self._height_heading / 2)
         self.surface.blit(render_text, rect)
 
         for _property in self._properties_names:
@@ -444,7 +443,8 @@ class GameMakerWindow:
         value = str(_values[name_arg])
         render_text = self._font_write_value.render(value, True, self._text_color)
         rect = render_text.get_rect()
-        rect.centerx = self.surface.get_width() / 2
-        rect.centery = \
+        rect.center = (
+            self.surface.get_width() / 2,
             y + self._size_block[1] - self._indent_between_components / 2 - self._size_change_value_button[1] / 2
+        )
         self.surface.blit(render_text, rect)

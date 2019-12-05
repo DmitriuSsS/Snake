@@ -1,3 +1,5 @@
+# TODO: дорефакторить
+
 import enum
 import random
 
@@ -35,7 +37,8 @@ class Game:
                 if e.key in TranslateDirection.direction:
                     return TranslateDirection.direction[e.key]
 
-    def _get_snake(self, mid: Vector, direction: Direction):
+    @staticmethod
+    def _get_snake(mid: Vector, direction: Direction):
         offset = TranslateDirection.dir_offset[direction]
         snake = [SnakePart(mid + offset, direction),
                  SnakePart(mid, direction),

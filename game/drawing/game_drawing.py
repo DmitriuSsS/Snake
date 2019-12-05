@@ -6,7 +6,7 @@ from tkinter import filedialog as fd
 import pygame
 
 from game.direction import Direction
-from game.drawing.components import Button
+from game.drawing.components import *
 from game.entities import Food, Level
 from game.settings import Settings
 from game.events import PickWall, PickSnake, PickEraser, Save
@@ -21,10 +21,10 @@ def _load_image(name):
     return pygame.image.load(settings.picture(name))
 
 
-def _draw_image(play_surface, image, left, top, rotate_angle=0):
+def _draw_image(play_surface, image, x, y, rotate_angle=0):
     if rotate_angle:
         image = pygame.transform.rotate(image, rotate_angle)
-    rect_image = image.get_rect(topleft=(top, left))
+    rect_image = image.get_rect(topleft=(x, y))
     play_surface.blit(image, rect_image)
 
 
@@ -84,8 +84,8 @@ class FieldDrawing:
         pointer = 0
         prev_sp = None
         for sp in self.field.snake:
-            location = (sp.location.y * self.size_cell,
-                        sp.location.x * self.size_cell)
+            location = (sp.location.x * self.size_cell,
+                        sp.location.y * self.size_cell)
             if pointer == 0:
                 _draw_image(self.surface,
                             self.snake_head,
@@ -118,16 +118,16 @@ class FieldDrawing:
             _draw_image(
                 self.surface,
                 self._food_image[food],
-                location.y * self.size_cell,
-                location.x * self.size_cell)
+                location.x * self.size_cell,
+                location.y * self.size_cell)
 
     def _draw_walls(self):
         for location in self.field.walls:
             _draw_image(
                 self.surface,
                 self.wall,
-                location.y * self.size_cell,
-                location.x * self.size_cell)
+                location.x * self.size_cell,
+                location.y * self.size_cell)
 
     def _draw_bg(self):
         if self.bg is not None:
@@ -146,7 +146,7 @@ class GameDrawing:
     size_cell = settings.picture_size
 
     _heart = _load_image('heart')
-    _toolbar = _load_image('toolbar')
+    _toolbar_color = pygame.Color('0x002137')
 
     def __init__(self, level, delta_x=0, delta_y=0):
         """
@@ -187,25 +187,43 @@ class LevelDrawing(GameDrawing):
         self.count_levels = count_levels
 
     def _draw_toolbar(self):
-        for i in range(self.level.field.width):
-            _draw_image(self.surface, self._toolbar, 0, i * self.size_cell)
-            _draw_image(self.surface, self._toolbar, self.size_cell, i * self.size_cell)
+        pygame.draw.rect(
+            self.surface,
+            self._toolbar_color,
+            pygame.Rect(0, 0, self.surface.get_width(), self.delta_y)
+        )
 
         for i in range(self.level.health):
             _draw_image(self.surface, self._heart,
-                        self.delta_y / 2 - 8, self.size_cell + 24 * i)
+                        self.size_cell * (i + 1.5), (self.delta_y - self._heart.get_height()) / 2)
 
         # пишет счёт у данного уровня
-        s_font = pygame.font.SysFont('monaco', 24)
-        s_surf = s_font.render(f'Score: {self.level.score}/{self.level.max_score}', True, pygame.Color('white'))
+        text = f'Score: {self.level.score}/{self.level.max_score}'
+        s_font = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                int((self.surface.get_width() - self.size_cell * 5 - 20) * 0.4),
+                int(self.delta_y * 0.65),
+                text
+            )
+        )
+        s_surf = s_font.render(text, True, pygame.Color('white'))
         s_rect = s_surf.get_rect()
         s_rect.topleft = ((self.surface.get_width() - s_rect.width) / 2,
                           (self.delta_y - s_rect.height) / 2)
         self.surface.blit(s_surf, s_rect)
 
-        # пишет какой уровень сейчас и сколько в общем
-        lvl_font = pygame.font.SysFont('monaco', 24)
-        lvl_surf = lvl_font.render(f'Level: {self.level_number}/{self.count_levels}', True, pygame.Color('white'))
+        # пишет какой уровень по счёту сейчас и сколько в общем
+        text = f'Level: {self.level_number}/{self.count_levels}'
+        lvl_font = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                int((self.surface.get_width() - self.size_cell * 5 - 20) * 0.4),
+                int(self.delta_y * 0.65),
+                text
+            )
+        )
+        lvl_surf = lvl_font.render(text, True, pygame.Color('white'))
         lvl_rect = lvl_surf.get_rect()
         lvl_rect.topleft = (self.surface.get_width() - 20 - lvl_rect.width,
                             (self.delta_y - s_rect.height) / 2)
@@ -217,24 +235,37 @@ class FreeGameDrawing(GameDrawing):
         super().__init__(level, delta_y=self.size_cell * 2)
 
     def _draw_toolbar(self):
-        for i in range(self.level.field.width):
-            _draw_image(self.surface, self._toolbar, 0, i * self.size_cell)
-            _draw_image(self.surface, self._toolbar, self.size_cell, i * self.size_cell)
+        pygame.draw.rect(
+            self.surface,
+            self._toolbar_color,
+            pygame.Rect(0, 0, self.surface.get_width(), self.delta_y)
+        )
 
-        s_font = pygame.font.SysFont('monaco', 24)
-        s_surf = s_font.render(f'Score: {self.level.score}', True, pygame.Color('white'))
+        score_text = f'Score: {self.level.score}'
+        s_font = pygame.font.SysFont(
+            'Calibri',
+            get_size_for_calibri(
+                int(self.surface.get_width() * 0.8),
+                int(self.delta_y * 0.65),
+                score_text
+            )
+        )
+        s_surf = s_font.render(score_text, True, pygame.Color('white'))
         s_rect = s_surf.get_rect()
         s_rect.topleft = ((self.surface.get_width() - s_rect.width) / 2,
                           (self.delta_y - s_rect.height) / 2)
         self.surface.blit(s_surf, s_rect)
 
 
+# TODO:: дорефакторить
+
 class GameMakerDrawing(GameDrawing):
     def __init__(self, level: Level):
-        super().__init__(level, delta_x=110)
+        self._width_toolbar = 110
+        super().__init__(level, delta_x=self._width_toolbar)
 
-        self.mode = 'grid'
-        self.active_button = None
+        self.mode = 'grid'  # mode = grid or preview
+        self._active_button = None
         self.direction_snake = Direction.RIGHT
 
         size_buttons = (45, 25)
@@ -246,51 +277,54 @@ class GameMakerDrawing(GameDrawing):
         snake_image = pygame.Surface((self.size_cell * 3, self.size_cell))
         _draw_image(snake_image, self.field_drawer.snake_tail, 0, 0,
                     self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
-        _draw_image(snake_image, self.field_drawer.snake_body, 0, self.size_cell,
+        _draw_image(snake_image, self.field_drawer.snake_body, self.size_cell, 0,
                     self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
-        _draw_image(snake_image, self.field_drawer.snake_head, 0, 2 * self.size_cell,
+        _draw_image(snake_image, self.field_drawer.snake_head, 2 * self.size_cell, 0,
                     self.field_drawer.dir_turn_angle_SBI[self.direction_snake])
         snake_image.set_colorkey(pygame.Color('black'))
 
         self.buttons_components = [Button(self.surface,
                                           pygame.Rect(x, self._height_header,
-                                          *self._size_buttons_components),
+                                                      *self._size_buttons_components),
                                           button_image=self.field_drawer.wall,
                                           name='wall',
                                           handler=self._handle_pick_wall),
                                    Button(self.surface,
                                           pygame.Rect(x, self._height_header + 5 + self._size_buttons_components[1],
-                                          *self._size_buttons_components),
+                                                      *self._size_buttons_components),
                                           button_color=pygame.Color('white'),
                                           name='eraser',
                                           handler=self._handle_pick_eraser),
                                    Button(self.surface,
                                           pygame.Rect(x - 14,
-                                          self._height_header + 10 + 2 * self._size_buttons_components[1],
-                                          snake_image.get_width(), snake_image.get_height()),
+                                                      self._height_header + 10 + 2 * self._size_buttons_components[1],
+                                                      snake_image.get_width(), snake_image.get_height()),
                                           button_image=snake_image,
                                           name='snake',
                                           handler=self._handle_pick_snake),
                                    Button(self.surface,
-                                          pygame.Rect(5, self._height_header + 15 + 3 * self._size_buttons_components[1],
-                                          self.delta_x - 10, 17),
+                                          pygame.Rect(5,
+                                                      self._height_header + 15 + 3 * self._size_buttons_components[1],
+                                                      self.delta_x - 10, 17),
                                           text='Back Ground',
                                           handler=self._handle_pick_bg),
                                    Button(self.surface,
-                                          pygame.Rect(5, self._height_header + 35 + 3 * self._size_buttons_components[1],
-                                          self.delta_x - 10, 17),
+                                          pygame.Rect(5,
+                                                      self._height_header + 35 + 3 * self._size_buttons_components[1],
+                                                      self.delta_x - 10, 17),
                                           text='Skip Back Ground',
                                           handler=self._skip_bg)]
 
         self.buttons_redirect = [Button(self.surface,
-                                        pygame.Rect(size_buttons[0] + 15, self.surface.get_height() - 5 - size_buttons[1],
-                                        *size_buttons),
+                                        pygame.Rect(size_buttons[0] + 15,
+                                                    self.surface.get_height() - 5 - size_buttons[1],
+                                                    *size_buttons),
                                         text='Save',
                                         handler=self._save_level)]
 
         self.button_change_mode = Button(self.surface,
                                          pygame.Rect(5, self.surface.get_height() - 5 - size_buttons[1],
-                                         *size_buttons),
+                                                     *size_buttons),
                                          name='mode',
                                          text='Preview',
                                          handler=self._handle_change_mode)
@@ -302,7 +336,7 @@ class GameMakerDrawing(GameDrawing):
         pygame.event.post(pick.event)
         for button in self.buttons_components:
             if button.name == 'wall':
-                self.active_button = button
+                self._active_button = button
                 break
 
     def _handle_pick_eraser(self):
@@ -310,7 +344,7 @@ class GameMakerDrawing(GameDrawing):
         pygame.event.post(pick.event)
         for button in self.buttons_components:
             if button.name == 'eraser':
-                self.active_button = button
+                self._active_button = button
                 break
 
     def _handle_pick_snake(self):
@@ -318,7 +352,7 @@ class GameMakerDrawing(GameDrawing):
         pygame.event.post(pick.event)
         for button in self.buttons_components:
             if button.name == 'snake':
-                self.active_button = button
+                self._active_button = button
                 break
 
     def _handle_change_mode(self):
@@ -387,8 +421,8 @@ class GameMakerDrawing(GameDrawing):
         snake = font.render('Snake -', True, pygame.Color('white'))
         self.surface.blit(snake, (5, self._height_header + 10 + 2 * self._size_buttons_components[1]))
 
-        if self.active_button is not None:
-            button = self.active_button
+        if self._active_button is not None:
+            button = self._active_button
             pygame.draw.rect(self.surface, pygame.Color('0x75bbfd'), button.rect, 3)
 
         for button in self.buttons:
@@ -398,12 +432,16 @@ class GameMakerDrawing(GameDrawing):
         super().draw()
 
         if self.mode == 'grid':
-            color_circle = pygame.Color('grey')
+            # TODO: разобраться с alpha
+            color_circle = pygame.Color('black')
+            color_circle.a = 128
             for i in range(self.level.field.width):
                 x = self.delta_x + (i + 1) * self.size_cell
-                pygame.draw.line(self.surface, color_circle,
-                                 (x, 0),
-                                 (x, self.surface.get_height()))
+                pygame.draw.line(
+                    self.surface, color_circle,
+                    (x, 0),
+                    (x, self.surface.get_height()),
+                )
 
             for i in range(self.level.field.height):
                 y = (i + 1) * self.size_cell
